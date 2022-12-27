@@ -29,7 +29,8 @@ class TweetProcessor:
     def __send_df_to_dashboard(self, df, target):
         labels = [str(t.label) for t in df.select("label").collect()]
         values = [p.value for p in df.select("value").collect()]
-        url = 'http://localhost:' + self.__fe_port + '/' + target
+        url = "http://localhost:" + str(self.__fe_port) + "/" + target
+        print(url)
         request_data = {'label': str(labels), 'data': str(values)}
         requests.post(url, data=request_data)
 

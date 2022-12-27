@@ -5,7 +5,7 @@ from app_bigdata_2022.backend.tweet_processor import TweetProcessor
 from app_bigdata_2022.frontend.controllers import app
 
 if __name__ == '__main__':
-    socket_port = 9004
+    socket_port = 9011
     fe_port = 5001
     gen = TweetGenerator(socket_port)
     proc = TweetProcessor(socket_port, fe_port)
