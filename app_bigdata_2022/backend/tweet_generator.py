@@ -1,6 +1,6 @@
 import json
-import sys
 import socket
+import sys
 import threading
 
 import requests
@@ -12,7 +12,6 @@ def send_tweets_to_spark(http_resp, tcp_connection):
             if line:
                 json_response = json.loads(line)
                 tweet_data = json_response['data']
-                # print("Tweet: " + str(tweet_data))
                 tcp_connection.send((json.dumps(tweet_data) + "\n").encode("utf-8"))
     except:
         e = sys.exc_info()[0]
@@ -21,9 +20,7 @@ def send_tweets_to_spark(http_resp, tcp_connection):
 
 class TweetGenerator:
     __localhost = "localhost"
-    __server_port = None
-    __server_socket = None
-    __server_thread = None
+    __twitter_stream_api = "https://api.twitter.com/2/tweets/sample/stream"
     __bearer_token = "AAAAAAAAAAAAAAAAAAAAAGiHkgEAAAAAdmv2aY2fZowkI9yOlHF64Azwo6g" \
                      "%3DKakPp8pFMREvacLFEbXTe5Uaf8zTYFRB9UuTzMVe3s0OkYlEFD "
 
@@ -40,9 +37,8 @@ class TweetGenerator:
     def __get_tweets(self):
         params = {'tweet.fields': 'public_metrics,lang'}
         response = requests.get(
-            "https://api.twitter.com/2/tweets/sample/stream", auth=self.__bearer_oauth, stream=True, params=params
+            self.__twitter_stream_api, auth=self.__bearer_oauth, stream=True, params=params
         )
-        print(response.status_code)
         if response.status_code != 200:
             raise Exception(
                 "Cannot get stream (HTTP {}): {}".format(
@@ -54,7 +50,7 @@ class TweetGenerator:
     def start_server(self):
         while True:
             self.__server_socket.listen(1)
-            print("Waiting for TCP connection...")
+            print("Waiting for client connection...")
             conn, addr = self.__server_socket.accept()
             client = threading.Thread(target=self.__client_handler, args=(conn,))
             client.start()

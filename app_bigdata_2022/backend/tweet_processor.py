@@ -18,18 +18,18 @@ def get_sql_context_instance(spark_context):
 
 
 class TweetProcessor:
-    __connection_port = None
     __log_level = "ERROR"
     __app_name = "twitter_bigdata"
     __checkpoint_name = "checkpoint_twitter_bigdata"
 
-    def __init__(self, server_port):
+    def __init__(self, server_port, fe_port):
         self.__connection_port = server_port
+        self.__fe_port = fe_port
 
     def __send_df_to_dashboard(self, df, target):
         labels = [str(t.label) for t in df.select("label").collect()]
         values = [p.value for p in df.select("value").collect()]
-        url = 'http://localhost:5001/' + target
+        url = 'http://localhost:' + self.__fe_port + '/' + target
         request_data = {'label': str(labels), 'data': str(values)}
         requests.post(url, data=request_data)
 
