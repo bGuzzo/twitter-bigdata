@@ -1,11 +1,10 @@
 import json
-import threading
-
-from pyspark import SparkConf, SparkContext
-from pyspark.streaming import StreamingContext
-from pyspark.sql import Row, SQLContext
 import sys
+
 import requests
+from pyspark import SparkConf, SparkContext
+from pyspark.sql import Row, SQLContext
+from pyspark.streaming import StreamingContext
 
 
 def aggregate(new_values, total_sum):
@@ -67,6 +66,9 @@ class TweetProcessor:
         mentions = words.filter(lambda w: str(w).startswith('@')).filter(lambda w: len(w) > 1).map(lambda x: (x, 1))
         tweet_lang = json_tweets.map(lambda j: str(j['lang'])).map(lambda x: (x, 1))
 
+        # Return a new "state" DStream where the state for each key is updated by applying the given function on the
+        # previous state of the key and the new values for the key. This can be used to maintain arbitrary state data
+        # for each key.
         total_words = words_map.updateStateByKey(aggregate)
         total_hashtags = hashtags.updateStateByKey(aggregate)
         total_mentions = mentions.updateStateByKey(aggregate)
